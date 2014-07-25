@@ -20,3 +20,19 @@ test('collapse', function (t) {
         });
     }));
 });
+
+test('collapse with _dereq_', function (t) {
+    t.plan(1 + expected.length);
+    
+    var src = fs.readFileSync(__dirname + '/collapse/bundle-derequire.js', 'utf8');
+    collapse(src, '_dereq_').pipe(concat(function (body) {
+        // console.log(src);
+        vm.runInNewContext(body, { console: { log: log } });
+        function log (msg) { t.equal(msg, 300) }
+        
+        var rows = unpack(body.toString('utf8'));
+        rows.forEach(function (row) {
+            t.deepEqual(row, expected.shift());
+        });
+    }));
+});
